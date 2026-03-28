@@ -7,7 +7,7 @@ export default function DisclaimerPage() {
       <Helmet>
         <title>Affiliate Disclaimer: NomadBudget Transparency</title>
         <meta name="description" content="Read our affiliate disclaimer to understand how we earn commissions and maintain our travel budget data." />
-        <link rel="canonical" href={window.location.href} />
+        <link rel="canonical" href="https://nomadbudget.netlify.app/disclaimer" />
       </Helmet>
 
       <main className="max-w-3xl mx-auto px-4 pt-20 space-y-12">

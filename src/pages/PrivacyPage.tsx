@@ -7,7 +7,7 @@ export default function PrivacyPage() {
       <Helmet>
         <title>Privacy Policy: NomadBudget GDPR & CCPA Compliance</title>
         <meta name="description" content="Read our privacy policy to understand how we collect, use, and protect your data at NomadBudget." />
-        <link rel="canonical" href={window.location.href} />
+        <link rel="canonical" href="https://nomadbudget.netlify.app/privacy" />
       </Helmet>
 
       <main className="max-w-3xl mx-auto px-4 pt-20 space-y-12">

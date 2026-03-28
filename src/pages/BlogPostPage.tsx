@@ -25,13 +25,14 @@ export default function BlogPostPage() {
       <Helmet>
         <title>{post.title} | NomadBudget Blog</title>
         <meta name="description" content={post.excerpt} />
-        <link rel="canonical" href={window.location.href} />
+        <link rel="canonical" href={`https://nomadbudget.netlify.app/blog/${post.slug}`} />
         
         {/* OpenGraph / Twitter */}
         <meta property="og:title" content={post.title} />
         <meta property="og:description" content={post.excerpt} />
         <meta property="og:image" content={post.image} />
         <meta property="og:type" content="article" />
+        <meta property="og:url" content={`https://nomadbudget.netlify.app/blog/${post.slug}`} />
         <meta name="twitter:card" content="summary_large_image" />
       </Helmet>
 

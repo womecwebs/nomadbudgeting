@@ -104,9 +104,17 @@ export default function ForecasterPage() {
   return (
     <div className="min-h-screen bg-[#FDFCFB] pb-20">
       <Helmet>
-        <title>{city ? `AI Travel Budget Forecast for ${city} | NomadBudget` : 'AI Trip Forecaster | NomadBudget'}</title>
-        <meta name="description" content={`Predict the cheapest time to visit ${city || 'any city'} with our AI-powered travel budget forecaster. Get real-time price trends and saving tips.`} />
+        <title>{city ? `${city} Travel Budget Forecast 2026: Cheapest Month to Visit` : 'AI Trip Forecaster 2026: Predict Travel Costs & Save'}</title>
+        <meta name="description" content={city ? `Planning a trip to ${city}? Predict the cheapest time to visit with our AI-powered 2026 travel budget forecaster. Get real-time price trends and saving tips.` : 'Predict the cheapest time to visit any city with our AI-powered 2026 travel budget forecaster. Get real-time price trends and saving tips.'} />
         <meta name="keywords" content={`cheapest time to visit ${city}, travel cost prediction ${city}, best month for budget travel to ${city}, AI travel budget forecaster`} />
+        <link rel="canonical" href={`https://nomadbudget.netlify.app/forecast${city ? `?city=${city}&country=${country}` : ''}`} />
+        
+        {/* OpenGraph / Twitter */}
+        <meta property="og:title" content={city ? `2026 Travel Budget Forecast for ${city}` : 'AI Trip Forecaster 2026'} />
+        <meta property="og:description" content={`Predict the cheapest time to visit ${city || 'any city'} with our AI-powered 2026 travel budget forecaster.`} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`https://nomadbudget.netlify.app/forecast${city ? `?city=${city}&country=${country}` : ''}`} />
+        <meta property="og:image" content={`https://dynamic-og-image-generator.vercel.app/api/generate?title=2026%20Forecast%20for%20${city || 'Your%20Trip'}&theme=dark`} />
       </Helmet>
 
       {/* Hero Section */}

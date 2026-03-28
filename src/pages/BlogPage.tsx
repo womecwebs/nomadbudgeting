@@ -11,7 +11,7 @@ export default function BlogPage() {
       <Helmet>
         <title>NomadBudget Blog: Expert Travel Tips & Cost Guides 2026</title>
         <meta name="description" content="Read our latest articles on budget travel, digital nomad life, and how to save money on your next adventure." />
-        <link rel="canonical" href={window.location.href} />
+        <link rel="canonical" href="https://nomadbudget.netlify.app/blog" />
       </Helmet>
 
       {/* Header */}

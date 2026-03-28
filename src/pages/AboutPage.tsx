@@ -9,7 +9,7 @@ export default function AboutPage() {
       <Helmet>
         <title>About NomadBudget: Our Mission & Story</title>
         <meta name="description" content="Learn about NomadBudget, the mission behind our travel budget calculator, and how we help travelers explore the world affordably." />
-        <link rel="canonical" href={window.location.href} />
+        <link rel="canonical" href="https://nomadbudget.netlify.app/about" />
       </Helmet>
 
       <main className="max-w-4xl mx-auto px-4 pt-20 space-y-20">

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, MapPin, Globe, ArrowRight, Wallet, ShieldCheck, Zap, BarChart3 } from 'lucide-react';
 import { motion } from 'motion/react';
+import { Helmet } from 'react-helmet-async';
 
 const destinations = [
   { city: 'Tokyo', country: 'Japan', img: 'https://picsum.photos/seed/tokyo/400/300' },
@@ -58,6 +59,18 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-[#FDFCFB]">
+      <Helmet>
+        <title>NomadBudget: 2026 Travel Budget Calculator & Cost Forecaster</title>
+        <meta name="description" content="Calculate real-time 2026 travel costs for 1000+ cities. Plan your nomad budget, find cheap flights, and book verified tours with NomadBudget." />
+        <link rel="canonical" href="https://nomadbudget.netlify.app/" />
+        
+        {/* OpenGraph / Twitter */}
+        <meta property="og:title" content="NomadBudget: 2026 Travel Budget Calculator" />
+        <meta property="og:description" content="Calculate real-time 2026 travel costs for 1000+ cities. Plan your nomad budget, find cheap flights, and book verified tours." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://nomadbudget.netlify.app/" />
+        <meta property="og:image" content="https://dynamic-og-image-generator.vercel.app/api/generate?title=NomadBudget%202026&theme=dark" />
+      </Helmet>
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-4 flex flex-col items-center justify-center">
         <motion.div 

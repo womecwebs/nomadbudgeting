@@ -1,3 +1,4 @@
 User-agent: *
 Allow: /
-Sitemap: https://ais-pre-2opht4ktfkazvvfhpzzlye-198509802446.europe-west2.run.app/sitemap.xml
+Disallow: /api/
+Sitemap: https://nomadbudget.netlify.app/sitemap.xml
