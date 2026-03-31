@@ -8,8 +8,8 @@ import { createClient } from "@supabase/supabase-js";
 dotenv.config();
 
 const supabase = createClient(
-  process.env.SUPABASE_URL || "",
-  process.env.SUPABASE_ANON_KEY || ""
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_ANON_KEY!
 );
 
 async function startServer() {
@@ -23,8 +23,7 @@ async function startServer() {
     const cityName = city.toLowerCase();
 
     // Step A: Query Supabase
-    const isSupabaseConfigured = process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY && 
-                                process.env.SUPABASE_URL !== "https://your-project.supabase.co";
+    const isSupabaseConfigured = process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY;
 
     if (isSupabaseConfigured) {
       try {
@@ -40,7 +39,6 @@ async function startServer() {
           thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
           if (lastUpdated > thirtyDaysAgo) {
-            console.log(`Cache hit for ${cityName}`);
             return res.json(cachedData);
           }
         }
@@ -52,7 +50,7 @@ async function startServer() {
     }
 
     // Step B: Fetch from RapidAPI if missing or old
-    if (!apiKey || apiKey === "YOUR_RAPIDAPI_KEY") {
+    if (!apiKey) {
       console.warn("RAPIDAPI_KEY is not configured. Returning fallback data.");
       return res.json({
         city_name: cityName,
@@ -190,7 +188,7 @@ async function startServer() {
       }
     ];
 
-    if (!viatorKey || viatorKey === "YOUR_VIATOR_KEY") {
+    if (!viatorKey) {
       console.warn("VIATOR_KEY not configured. Returning fallback tours.");
       return res.json(fallbackTours);
     }
@@ -289,6 +287,90 @@ async function startServer() {
     res.json(hotels);
   });
 
+  // AI Forecast API
+  app.post("/api/forecast", async (req, res) => {
+    const { city, country } = req.body;
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    if (!apiKey) {
+      return res.status(500).json({ error: "Gemini API key not configured" });
+    }
+
+    try {
+      const { GoogleGenAI } = await import("@google/genai");
+      const ai = new GoogleGenAI({ apiKey });
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: `Generate a travel budget forecast for ${city}, ${country}. 
+        Provide the following in JSON format:
+        1. "trendData": An array of 12 objects with "month" (Jan-Dec) and "price" (estimated daily cost in USD).
+        2. "bestMonth": The cheapest month to visit.
+        3. "savingsPercent": How much cheaper it is compared to peak season.
+        4. "summary": A 2-3 sentence professional explanation of the price trends.
+        5. "tips": 3 bullet points for saving money in this specific city.
+        6. "confidence": A percentage (e.g., "92%").`,
+        config: {
+          responseMimeType: "application/json"
+        }
+      });
+
+      res.json(JSON.parse(response.text));
+    } catch (error: any) {
+      console.error("Gemini Error:", error.message);
+      res.status(500).json({ error: "Failed to generate forecast" });
+    }
+  });
+
+  // Robots.txt dynamic route
+  app.get("/robots.txt", (req, res) => {
+    const appUrl = process.env.APP_URL || "https://nomadbudget.netlify.app";
+    res.type("text/plain");
+    res.send(`User-agent: *
+Allow: /
+Disallow: /api/
+Sitemap: ${appUrl}/sitemap.xml`);
+  });
+
+  // Sitemap.xml dynamic route
+  app.get("/sitemap.xml", (req, res) => {
+    const appUrl = process.env.APP_URL || "https://nomadbudget.netlify.app";
+    const date = new Date().toISOString().split('T')[0];
+    res.type("application/xml");
+    res.send(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${appUrl}/</loc>
+    <lastmod>${date}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>${appUrl}/blog</loc>
+    <lastmod>${date}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>${appUrl}/about</loc>
+    <lastmod>${date}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>${appUrl}/privacy</loc>
+    <lastmod>${date}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>${appUrl}/disclaimer</loc>
+    <lastmod>${date}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+</urlset>`);
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
@@ -305,7 +387,6 @@ async function startServer() {
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
   });
 
   return app;

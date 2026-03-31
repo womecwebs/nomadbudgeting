@@ -27,7 +27,6 @@ import {
   AreaChart,
   Area
 } from 'recharts';
-import { GoogleGenAI } from "@google/genai";
 
 // Mock data for initial state or fallback
 const initialTrendData = [
@@ -63,23 +62,14 @@ export default function ForecasterPage() {
     setForecast(null);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: `Generate a travel budget forecast for ${city}, ${country}. 
-        Provide the following in JSON format:
-        1. "trendData": An array of 12 objects with "month" (Jan-Dec) and "price" (estimated daily cost in USD).
-        2. "bestMonth": The cheapest month to visit.
-        3. "savingsPercent": How much cheaper it is compared to peak season.
-        4. "summary": A 2-3 sentence professional explanation of the price trends.
-        5. "tips": 3 bullet points for saving money in this specific city.
-        6. "confidence": A percentage (e.g., "92%").`,
-        config: {
-          responseMimeType: "application/json"
-        }
+      const response = await fetch('/api/forecast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ city, country })
       });
 
-      const data = JSON.parse(response.text);
+      if (!response.ok) throw new Error('Failed to fetch forecast');
+      const data = await response.json();
       setForecast(data);
       
       // Update URL without reloading
