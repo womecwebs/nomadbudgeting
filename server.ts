@@ -23,25 +23,32 @@ async function startServer() {
     const cityName = city.toLowerCase();
 
     // Step A: Query Supabase
-    try {
-      const { data: cachedData, error: cacheError } = await supabase
-        .from("city_costs")
-        .select("*")
-        .eq("city_name", cityName)
-        .single();
+    const isSupabaseConfigured = process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY && 
+                                process.env.SUPABASE_URL !== "https://your-project.supabase.co";
 
-      if (cachedData) {
-        const lastUpdated = new Date(cachedData.last_updated);
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    if (isSupabaseConfigured) {
+      try {
+        const { data: cachedData, error: cacheError } = await supabase
+          .from("city_costs")
+          .select("*")
+          .eq("city_name", cityName)
+          .single();
 
-        if (lastUpdated > thirtyDaysAgo) {
-          console.log(`Cache hit for ${cityName}`);
-          return res.json(cachedData);
+        if (cachedData) {
+          const lastUpdated = new Date(cachedData.last_updated);
+          const thirtyDaysAgo = new Date();
+          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+          if (lastUpdated > thirtyDaysAgo) {
+            console.log(`Cache hit for ${cityName}`);
+            return res.json(cachedData);
+          }
         }
+      } catch (err) {
+        console.error("Cache check failed:", err);
       }
-    } catch (err) {
-      console.error("Cache check failed:", err);
+    } else {
+      console.warn("Supabase not configured. Skipping cache check.");
     }
 
     // Step B: Fetch from RapidAPI if missing or old
@@ -114,7 +121,13 @@ async function startServer() {
       };
 
       // Step C: Save to Supabase
-      await supabase.from("city_costs").upsert(newRecord, { onConflict: "city_name" });
+      if (isSupabaseConfigured) {
+        try {
+          await supabase.from("city_costs").upsert(newRecord, { onConflict: "city_name" });
+        } catch (err) {
+          console.error("Failed to save to Supabase:", err);
+        }
+      }
 
       res.json(newRecord);
     } catch (error: any) {
@@ -186,9 +199,7 @@ async function startServer() {
       const response = await axios.post(
         "https://api.viator.com/partner/products/search",
         {
-          filtering: {
-            destination: city,
-          },
+          searchTerm: city,
           pagination: {
             start: 1,
             count: 3,
